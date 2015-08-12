@@ -1,8 +1,12 @@
 package com.oleksandr.mytodolist;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,15 +15,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import com.activeandroid.content.ContentProvider;
+import com.oleksandr.mytodolist.model.ToDoItem;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private LoaderManager loaderManager;
+    private RecyclerView recycler;
+    private ToDoListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        RecyclerView recycler = (RecyclerView) this.findViewById(R.id.todo_list);
-        recycler.setAdapter(new ToDoListAdapter());
+        recycler = (RecyclerView) this.findViewById(R.id.todo_list);
+        adapter = new ToDoListAdapter(null);
+        recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
         recycler.setLayoutManager(new LinearLayoutManager(this));
         FloatingActionButton addDeviceBtn = (FloatingActionButton) findViewById(R.id.add_todo_item_btn);
@@ -30,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addItemIntent);
             }
         });
+        loaderManager = getSupportLoaderManager();
+        loaderManager.initLoader(0, null, this);
     }
 
     @Override
@@ -52,5 +65,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(MainActivity.this,
+                ContentProvider.createUri(ToDoItem.class, null),
+                null, null, null, null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }

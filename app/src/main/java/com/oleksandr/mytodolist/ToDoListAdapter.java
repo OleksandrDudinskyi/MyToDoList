@@ -1,5 +1,6 @@
 package com.oleksandr.mytodolist;
 
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.UiThread;
 import android.support.v7.widget.RecyclerView;
@@ -10,24 +11,27 @@ import android.view.ViewGroup;
 import com.oleksandr.mytodolist.databinding.ListItemBinding;
 import com.oleksandr.mytodolist.model.ToDoItem;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Oleksandr on 8/12/2015.
  */
-public class ToDoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ToDoItem> itemsList = new ArrayList<>();
+public class ToDoListAdapter extends CursorRecyclerViewAdapter<ToDoListAdapter.ViewHolder> {
+    public ToDoListAdapter(Cursor cursor) {
+        super(cursor);
+    }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         final LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
         ListItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.list_item, viewGroup, false);
         return new ViewHolder(binding.getRoot(), binding);
     }
 
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int i) {
+    public void onBindViewHolderCursor(ViewHolder holder, Cursor cursor) {
+        if (cursor != null && cursor.getCount() > 0) {
+            String title = cursor.getString(cursor.getColumnIndex(ToDoItem.COLUMN_TITLE));
+            ToDoItem.Builder builder = new ToDoItem.Builder();
+            holder.bind(builder.title(title).build());
+        }
 
     }
 
