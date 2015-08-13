@@ -41,6 +41,10 @@
             android:authorities="com.oleksandr.mytodolist"
             android:exported="false"
             android:syncable="true" />
+        <receiver android:name=".OverDueItemReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
     </application>
-
 </manifest>

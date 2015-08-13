@@ -1,13 +1,15 @@
 package com.oleksandr.mytodolist;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,12 +19,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Select;
+import com.oleksandr.mytodolist.model.State;
 import com.oleksandr.mytodolist.model.ToDoItem;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -40,6 +41,7 @@ public class AddItemActivity extends AppCompatActivity {
     private int dueDay;
     private int dueHours;
     private int dueMinutes;
+    private Calendar dueDate;
 
     private DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
         @Override
@@ -60,9 +62,9 @@ public class AddItemActivity extends AppCompatActivity {
             dueHours = hourOfDay;
             dueMinutes = minute;
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault());
-            final Calendar c = Calendar.getInstance();
-            c.set(dueYear, dueMonth, dueDay, dueHours, dueMinutes);
-            dateView.setText(sdf.format(c.getTime()));
+            dueDate = Calendar.getInstance();
+            dueDate.set(dueYear, dueMonth, dueDay, dueHours, dueMinutes);
+            dateView.setText(sdf.format(dueDate.getTime()));
         }
     };
 
@@ -111,17 +113,15 @@ public class AddItemActivity extends AppCompatActivity {
                 toDoItemBuilder.title(titleView.getText().toString()).
                         description(descriptionView.getText().toString()).
                         urgent(urgentView.isChecked()).dueDate(dateView.getText().toString()).
-                        build().save();
+                        state(State.UNDONE.getStatus()).build().save();
+                Intent intent = new Intent(this, OverDueItemReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, dueDate.getTimeInMillis(), pendingIntent);
                 ActiveAndroid.setTransactionSuccessful();
             } finally {
                 ActiveAndroid.endTransaction();
             }
-
-            List<ToDoItem> workouts = new Select()
-                    .distinct()
-                    .from(ToDoItem.class)
-                    .execute();
-            Log.d("test","count: " + workouts.size());
             setResult(RESULT_OK);
             finish();
         }
