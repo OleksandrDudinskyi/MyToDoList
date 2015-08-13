@@ -37,7 +37,7 @@ public class ToDoListAdapter extends CursorRecyclerViewAdapter<ToDoListAdapter.V
 
     @Override
     public int getItemCount() {
-        return 0;
+        return super.getItemCount();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

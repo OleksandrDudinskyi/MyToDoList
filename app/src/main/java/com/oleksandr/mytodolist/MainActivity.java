@@ -14,21 +14,29 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.activeandroid.content.ContentProvider;
 import com.oleksandr.mytodolist.model.ToDoItem;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int ADD_ITEM_REQUEST_CODE = 0xff01;
     private LoaderManager loaderManager;
     private RecyclerView recycler;
     private ToDoListAdapter adapter;
+    private TextView emptyView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        recycler = (RecyclerView) this.findViewById(R.id.todo_list);
+        recycler = (RecyclerView) findViewById(R.id.todo_list);
+        emptyView = (TextView) findViewById(R.id.empty);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        progressBar.setVisibility(View.VISIBLE);
         adapter = new ToDoListAdapter(null);
         recycler.setAdapter(adapter);
         recycler.setHasFixedSize(true);
@@ -38,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onClick(View v) {
                 Intent addItemIntent = new Intent(MainActivity.this, AddItemActivity.class);
-                startActivity(addItemIntent);
+                startActivityForResult(addItemIntent, ADD_ITEM_REQUEST_CODE);
             }
         });
         loaderManager = getSupportLoaderManager();
@@ -67,6 +75,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (resultCode == RESULT_OK && requestCode == ADD_ITEM_REQUEST_CODE) {
+//            loaderManager.restartLoader(0, null, this);
+//            adapter.notifyDataSetChanged();
+//        }
+//    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(MainActivity.this,
@@ -77,11 +94,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        adapter.swapCursor(data);
+        progressBar.setVisibility(View.GONE);
+        if (data != null && data.getCount() > 0) {
+            emptyView.setVisibility(View.GONE);
+            adapter.swapCursor(data);
+        } else {
+            emptyView.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        progressBar.setVisibility(View.VISIBLE);
         adapter.swapCursor(null);
     }
 }

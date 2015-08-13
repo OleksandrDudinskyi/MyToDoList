@@ -16,3 +16,6 @@
 .idea/runConfigurations.xml
 MyToDoList.iml
 app/app.iml
+.idea/dbnavigator.xml
+.idea/qaplug_profiles.xml
+.idea/r2murlcache.xml

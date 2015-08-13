@@ -62,7 +62,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:hint="12/08/2014"
-        android:text="Due Date" />
+        android:text="Due Date"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
         android:id="@+id/save_btn"
