@@ -25,7 +25,7 @@ public class ToDoItem extends Model {
     @Column(name = COLUMN_DESCRIPTION)
     private String description;
     @Column(name = COLUMN_IS_URGENT)
-    private boolean isUrgent;
+    private int isUrgent;
     @Column(name = COLUMN_DUE_DATE)
     private String dueDate;
     @Column(name = COLUMN_STATE)
@@ -55,11 +55,11 @@ public class ToDoItem extends Model {
         this.description = description;
     }
 
-    public boolean isUrgent() {
+    public int isUrgent() {
         return isUrgent;
     }
 
-    public void setUrgent(boolean isUrgent) {
+    public void setUrgent(int isUrgent) {
         this.isUrgent = isUrgent;
     }
 
@@ -91,7 +91,7 @@ public class ToDoItem extends Model {
             return this;
         }
 
-        public Builder urgent(boolean value) {
+        public Builder urgent(int value) {
             toBuild.isUrgent = value;
             return this;
         }

@@ -112,12 +112,14 @@ public class AddItemActivity extends AppCompatActivity {
                 ToDoItem.Builder toDoItemBuilder = new ToDoItem.Builder();
                 toDoItemBuilder.title(titleView.getText().toString()).
                         description(descriptionView.getText().toString()).
-                        urgent(urgentView.isChecked()).dueDate(dateView.getText().toString()).
-                        state(State.UNDONE.getStatus()).build().save();
-                Intent intent = new Intent(this, OverDueItemReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                alarmManager.set(AlarmManager.RTC_WAKEUP, dueDate.getTimeInMillis(), pendingIntent);
+                        urgent(urgentView.isChecked() ? 1 : 0).dueDate(dateView.getText().toString()).
+                        state(State.PENDING.getStatus()).build().save();
+                if (dueDate != null) {
+                    Intent intent = new Intent(this, OverDueItemReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+                    AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, dueDate.getTimeInMillis(), pendingIntent);
+                }
                 ActiveAndroid.setTransactionSuccessful();
             } finally {
                 ActiveAndroid.endTransaction();

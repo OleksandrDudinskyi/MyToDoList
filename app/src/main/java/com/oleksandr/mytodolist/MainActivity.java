@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.activeandroid.content.ContentProvider;
+import com.oleksandr.mytodolist.model.State;
 import com.oleksandr.mytodolist.model.ToDoItem;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -88,7 +89,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(MainActivity.this,
                 ContentProvider.createUri(ToDoItem.class, null),
-                null, null, null, null
+                null, ToDoItem.COLUMN_STATE + "= ? OR " + ToDoItem.COLUMN_STATE + "= ? OR " +
+                ToDoItem.COLUMN_STATE + "= ?",
+                new String[]{State.PENDING.getStatus(), State.OVERDUE.getStatus(), State.DONE.getStatus()}, ToDoItem.COLUMN_IS_URGENT + " DESC"
         );
     }
 

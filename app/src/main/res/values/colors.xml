@@ -2,4 +2,5 @@
 <resources>
     <color name="color_primary">#34A8DF</color>
     <color name="card_view_main">#7accf4</color>
+    <color name="card_view_urgent">#f1f47f</color>
 </resources>
